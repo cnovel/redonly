@@ -2,3 +2,4 @@ out/
 out_folder/
 dist/
 **/*.egg-info/**
+venv*/
