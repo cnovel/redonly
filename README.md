@@ -2,6 +2,9 @@
 [![tests](https://github.com/cnovel/redonly/actions/workflows/python-test.yml/badge.svg)](https://github.com/cnovel/redonly/actions/workflows/python-test.yml)
 [![codecov](https://codecov.io/gh/cnovel/redonly/branch/main/graph/badge.svg?token=nZ6KVUwGel)](https://codecov.io/gh/cnovel/redonly)
 ![PyPI](https://img.shields.io/pypi/v/redonly)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/redonly)
+
+
 
 `redonly` is a Python package used for creating a static archive of Reddit subs at present time.
 
