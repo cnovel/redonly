@@ -9,6 +9,7 @@ from datetime import datetime
 from urllib.parse import urlparse, urljoin
 from PIL import Image
 from importlib import metadata
+from babel.dates import format_date, format_datetime, format_time
 
 try:
     __version__ = metadata.version(__package__)
@@ -153,9 +154,20 @@ class RedOnly:
             "Accept": "application/json",
         }
 
+    def _get_local_from_lang(self):
+        d = {
+            Language.en: "en_US",
+            Language.fr: "fr_FR"
+        }
+        return d[self.lang]
+
     def _write_subreddit(self, sub: str) -> bool:
         s = requests.Session()
-        refresh_date = f'{datetime.now():%d %B %Y} at {datetime.now():%H:%M}'
+        now = datetime.now()
+        d = format_date(now, locale=self._get_local_from_lang())
+        t = format_time(now, locale=self._get_local_from_lang(), format='short')
+
+        refresh_date = f'{d}, {t}'
         data = s.get(f"https://www.reddit.com/r/{sub}/hot.json", headers=self._get_headers())
         if not data.status_code == 200:
             logging.error(f"Failed to get data ({data.status_code}) for {sub}")
