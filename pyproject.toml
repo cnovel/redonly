@@ -19,6 +19,7 @@ dependencies = [
     "Markdown ~= 3.3.6",
     "Pillow ~= 10.0.0",
     "requests ~= 2.25.1",
+    "StrEnum ~= 0.4.15",
 ]
 
 [project.optional-dependencies]

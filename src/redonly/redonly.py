@@ -3,7 +3,8 @@ import os
 import markdown
 import shutil
 import logging
-from enum import Enum
+from enum import auto
+from strenum import StrEnum
 from datetime import datetime
 from urllib.parse import urlparse, urljoin
 from PIL import Image
@@ -38,9 +39,9 @@ def download_image(img_url: str, is_thumbnail: bool, out_folder: str) -> str:
         return ""
 
 
-class Language(str, Enum):
-    en = 'en'
-    fr = 'fr'
+class Language(StrEnum):
+    en = auto()
+    fr = auto()
 
 
 def get_path(f: str, lang: Language) -> str:
