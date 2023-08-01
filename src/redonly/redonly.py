@@ -157,7 +157,7 @@ class RedOnly:
             content = content.replace("$$SUBREDDIT$$", sub)
             content = content.replace("$$ELEMENTS$$", elements)
             content = content.replace("$$LAST_REFRESH_STR$$", refresh_date)
-            with open(f"{self.out_folder}/{sub}.html", 'w') as ro_page:
+            with open(f"{self.out_folder}/{sub}.html", 'w', encoding='utf-8') as ro_page:
                 ro_page.write(content)
         return True
 
