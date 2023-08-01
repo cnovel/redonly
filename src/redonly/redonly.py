@@ -10,7 +10,7 @@ from importlib import metadata
 
 try:
     __version__ = metadata.version(__package__)
-except metadata.PackageNotFoundError as e:
+except metadata.PackageNotFoundError:
     __version__ = "9999.9999.9999-githubclone"
 
 
@@ -29,13 +29,13 @@ def download_image(img_url: str, is_thumbnail: bool, out_folder: str) -> str:
         if is_thumbnail:
             size = img.size
             factor = min(size)/50
-            img = img.resize((int(size[0]/factor) + 1,int(size[1]/factor) + 1),Image.ANTIALIAS)
+            img = img.resize((int(size[0]/factor) + 1, int(size[1]/factor) + 1), Image.ANTIALIAS)
         img.save(img_out, optimize=True, quality=q)
         return img_name
     except:
         os.remove(img_out)
         return ""
-    
+
 
 class Post:
     def __init__(self, p) -> None:
@@ -46,15 +46,16 @@ class Post:
         self.domain = p["domain"]
         self.score = p["score"]
         self.thumb_url = p["thumbnail"]
-        self.flair = " ".join([x for x in p["link_flair_text"].split(" ") if not x.endswith(":") and not x.startswith(":")]) if p["link_flair_text"] else ""
+        self.flair = " ".join([x for x in p["link_flair_text"].split(" ") if not x.endswith(":") and not x.startswith(":")]) \
+            if p["link_flair_text"] else ""
         self.flair_color = p["link_flair_background_color"]
         self.flair_text_color = p["link_flair_text_color"]
         self.self_post_data = p["selftext"] if p["is_self"] else None
         self.is_image = "post_hint" in p and p["post_hint"] == "image"
-    
+
     def __str__(self) -> str:
         return f"{self.title} by {self.author} at {self.datetime} - ({self.domain}) - {self.score}"
-    
+
     def create_element(self, out_folder: str) -> str:
         element_path = f"{os.path.dirname(os.path.realpath(__file__))}/data/element.html"
         with open(element_path, 'r') as template:
@@ -99,7 +100,7 @@ class Subreddit:
         self.description = sr_data["public_description"]
         self.name = sr_data["display_name"]
         self.img = sr_data["community_icon"].split("?")[0]
-    
+
     def create_element(self, out_folder: str) -> str:
         sub_path = f"{os.path.dirname(os.path.realpath(__file__))}/data/sub.html"
         with open(sub_path, 'r') as template:
@@ -118,7 +119,7 @@ class RedOnly:
     def __init__(self, out_folder: str, subreddits) -> None:
         self.out_folder = out_folder
         self.subreddits = sorted(subreddits, key=lambda v: v.upper())
-    
+
     @staticmethod
     def version() -> str:
         return __version__
@@ -133,32 +134,32 @@ class RedOnly:
         }
 
     def _write_subreddit(self, sub: str) -> bool:
-            s = requests.Session()
-            refresh_date = f'{datetime.now():%d %B %Y} at {datetime.now():%H:%M}'
-            data = s.get(f"https://www.reddit.com/r/{sub}/hot.json", headers=self._get_headers())
-            if not data.status_code == 200:
-                logging.error(f"Failed to get data ({data.status_code}) for {sub}")
-                return False
+        s = requests.Session()
+        refresh_date = f'{datetime.now():%d %B %Y} at {datetime.now():%H:%M}'
+        data = s.get(f"https://www.reddit.com/r/{sub}/hot.json", headers=self._get_headers())
+        if not data.status_code == 200:
+            logging.error(f"Failed to get data ({data.status_code}) for {sub}")
+            return False
 
-            j = data.json()
-            posts = []
-            for p in j["data"]["children"]:
-                post = Post(p["data"])
-                posts.append(post)
+        j = data.json()
+        posts = []
+        for p in j["data"]["children"]:
+            post = Post(p["data"])
+            posts.append(post)
 
-            elements = ""
-            for p in posts:
-                elements += p.create_element(self.out_folder)
+        elements = ""
+        for p in posts:
+            elements += p.create_element(self.out_folder)
 
-            template_path = f"{os.path.dirname(os.path.realpath(__file__))}/data/template.html"
-            with open(template_path, 'r') as page:
-                content = page.read()
-                content = content.replace("$$SUBREDDIT$$", sub)
-                content = content.replace("$$ELEMENTS$$", elements)
-                content = content.replace("$$LAST_REFRESH_STR$$", refresh_date)
-                with open(f"{self.out_folder}/{sub}.html", 'w') as ro_page:
-                    ro_page.write(content)
-            return True
+        template_path = f"{os.path.dirname(os.path.realpath(__file__))}/data/template.html"
+        with open(template_path, 'r') as page:
+            content = page.read()
+            content = content.replace("$$SUBREDDIT$$", sub)
+            content = content.replace("$$ELEMENTS$$", elements)
+            content = content.replace("$$LAST_REFRESH_STR$$", refresh_date)
+            with open(f"{self.out_folder}/{sub}.html", 'w') as ro_page:
+                ro_page.write(content)
+        return True
 
     def _write_index(self) -> bool:
         s = requests.Session()
@@ -172,7 +173,6 @@ class RedOnly:
         subs = ""
         for sub in subreddits_data:
             subs += sub.create_element(self.out_folder)
-
 
         template_path = f"{os.path.dirname(os.path.realpath(__file__))}/data/template.html"
         with open(template_path) as page:
@@ -191,13 +191,13 @@ class RedOnly:
         except OSError as e:
             logging.error(f"Failed to clean {self.out_folder}: {e}")
             return False
-        
+
         try:
             os.makedirs(self.out_folder)
-        except OSError:
+        except OSError as e:
             logging.error(f"Failed to create {self.out_folder}: {e}")
             return False
-        
+
         style_path = f"{os.path.dirname(os.path.realpath(__file__))}/data/style.css"
         try:
             shutil.copyfile(style_path, os.path.join(self.out_folder, "style.css"))
@@ -212,7 +212,7 @@ class RedOnly:
                 return False
         logging.info("Creating index...")
         if not self._write_index():
-            logging.error(f"Failed to write index")
+            logging.error("Failed to write index")
             return False
         logging.info("All done!")
         return True
