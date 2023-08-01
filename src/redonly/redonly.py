@@ -43,8 +43,8 @@ class Language(str, Enum):
     fr = 'fr'
 
 
-def get_path(f: str, l: Language) -> str:
-    return f"{os.path.dirname(os.path.realpath(__file__))}/data/{l}/{f}"
+def get_path(f: str, lang: Language) -> str:
+    return f"{os.path.dirname(os.path.realpath(__file__))}/data/{lang/{f}"
 
 
 class Post:
