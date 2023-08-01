@@ -48,8 +48,12 @@ class Style(StrEnum):
     original = auto()
 
 
-def get_path(f: str, lang: Language) -> str:
+def get_html_path(f: str, lang: Language) -> str:
     return f"{os.path.dirname(os.path.realpath(__file__))}/data/{lang}/{f}"
+
+
+def get_style_path(f: str) -> str:
+    return f"{os.path.dirname(os.path.realpath(__file__))}/data/styles/{f}"
 
 
 class Post:
@@ -70,7 +74,7 @@ class Post:
         self.lang = lang
 
     def create_element(self, out_folder: str) -> str:
-        element_path = get_path("element.html", self.lang)
+        element_path = get_html_path("element.html", self.lang)
         with open(element_path, 'r') as template:
             content = template.read()
             img_name = ""
@@ -87,7 +91,7 @@ class Post:
             flair_text_color = "#fff" if self.flair_text_color == "light" else "#333"
             content = content.replace("$$FLAIR_TEXT_COLOR$$", flair_text_color)
             if self.self_post_data is not None:
-                self_post_path = get_path("self_post.html", self.lang)
+                self_post_path = get_html_path("self_post.html", self.lang)
                 with open(self_post_path, 'r') as sp:
                     content_sp = sp.read()
                     content_sp = content_sp.replace("$$SELF_POST$$", f"<p>{markdown.markdown(self.self_post_data)}</p>")
@@ -95,7 +99,7 @@ class Post:
             elif self.is_image:
                 img_name = download_image(self.url, False, out_folder)
                 if len(img_name) > 0:
-                    self_img_path = get_path("self_image.html", self.lang)
+                    self_img_path = get_html_path("self_image.html", self.lang)
                     with open(self_img_path, 'r') as si:
                         content_si = si.read()
                         content_si = content_si.replace("$$IMG_URL$$", img_name)
@@ -116,7 +120,7 @@ class Subreddit:
         self.lang = lang
 
     def create_element(self, out_folder: str) -> str:
-        sub_path = get_path("sub.html", self.lang)
+        sub_path = get_html_path("sub.html", self.lang)
         with open(sub_path, 'r') as template:
             content = template.read()
             img_name = ""
@@ -167,7 +171,7 @@ class RedOnly:
         for p in posts:
             elements += p.create_element(self.out_folder)
 
-        template_path = get_path("template.html", self.lang)
+        template_path = get_html_path("template.html", self.lang)
         with open(template_path, 'r') as page:
             content = page.read()
             content = content.replace("$$SUBREDDIT$$", sub)
@@ -190,7 +194,7 @@ class RedOnly:
         for sub in subreddits_data:
             subs += sub.create_element(self.out_folder)
 
-        template_path = get_path("template.html", self.lang)
+        template_path = get_html_path("template.html", self.lang)
         with open(template_path) as page:
             content = page.read()
             content = content.replace("$$SUBREDDIT$$", "index")
@@ -219,7 +223,7 @@ class RedOnly:
         if not self._set_up_folder():
             return False
 
-        style_path = get_path(f"{self.style}.css", self.lang)
+        style_path = get_style_path(f"{self.style}.css")
         try:
             shutil.copyfile(style_path, os.path.join(self.out_folder, "style.css"))
         except Exception:
