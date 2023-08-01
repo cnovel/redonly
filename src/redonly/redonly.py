@@ -208,10 +208,3 @@ class RedOnly:
             return False
         logging.info("All done!")
         return True
-logging.basicConfig(level=20)
-g = RedOnly("out_folder", ["Lyon", "AmitheAsshole"])
-if not g.generate():
-    print("Failed to generate RedOnly")
-    exit(1)
-print("Generation success!")
-exit(0)

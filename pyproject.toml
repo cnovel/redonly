@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "redonly"
+version = "0.0.1"
+authors = [
+  { name="Cyril Novel" },
+]
+description = "This package creates a static archive of subreddits page at present time."
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
+]
+dependencies = [
+    "Markdown ~= 3.3.6",
+    "Pillow ~= 9.0.1",
+    "requests ~= 2.25.1",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/cnovel/RedOnly"
