@@ -58,7 +58,7 @@ class Post:
         self.thumb_url = p["thumbnail"]
         self.flair = " ".join([x for x in p["link_flair_text"].split(" ") if not x.endswith(":") and not x.startswith(":")]) \
             if p["link_flair_text"] else ""
-        self.flair_color = p["link_flair_background_color"]
+        self.flair_color = p["link_flair_background_color"] if p["link_flair_background_color"] else "#666"
         self.flair_text_color = p["link_flair_text_color"]
         self.self_post_data = p["selftext"] if p["is_self"] else None
         self.is_image = "post_hint" in p and p["post_hint"] == "image"
@@ -217,7 +217,7 @@ class RedOnly:
         try:
             shutil.copyfile(style_path, os.path.join(self.out_folder, "style.css"))
         except Exception:
-            logging.error(f"Failed cococ to copy style from {style_path}")
+            logging.error(f"Failed to copy style from {style_path}")
             return False
 
         for sub in self.subreddits:
