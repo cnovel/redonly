@@ -29,7 +29,7 @@ def download_image(img_url: str, is_thumbnail: bool, out_folder: str) -> str:
         if is_thumbnail:
             size = img.size
             factor = min(size)/50
-            img = img.resize((int(size[0]/factor) + 1, int(size[1]/factor) + 1), Image.ANTIALIAS)
+            img = img.resize((int(size[0]/factor) + 1, int(size[1]/factor) + 1), Image.LANCZOS)
         img.save(img_out, optimize=True, quality=q)
         return img_name
     except Exception:
