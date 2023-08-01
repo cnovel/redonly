@@ -108,8 +108,6 @@ class RedOnly:
     def __init__(self, out_folder: str, subreddits) -> None:
         self.out_folder = out_folder
         self.subreddits = sorted(subreddits, key=lambda v: v.upper())
-        self.logger = logging.Logger("RedOnly")
-        self.logger.setLevel(10)
     
     @staticmethod
     def version() -> str:
@@ -129,7 +127,7 @@ class RedOnly:
             refresh_date = f'{datetime.now():%d %B %Y} at {datetime.now():%H:%M}'
             data = s.get(f"https://www.reddit.com/r/{sub}/hot.json", headers=self._get_headers())
             if not data.status_code == 200:
-                self.logger.error(f"Failed to get data ({data.status_code}) for {sub}")
+                logging.error(f"Failed to get data ({data.status_code}) for {sub}")
                 return False
 
             j = data.json()
@@ -157,7 +155,7 @@ class RedOnly:
         for sub in self.subreddits:
             data = s.get(f"https://www.reddit.com/r/{sub}/about.json", headers=self._get_headers())
             if not data.status_code == 200:
-                self.logger.error(f"Failed to get about data ({data.status_code}) for {sub}")
+                logging.error(f"Failed to get about data ({data.status_code}) for {sub}")
                 return False
             subreddits_data.append(Subreddit(sub, data.json()["data"]))
         subs = ""
@@ -178,33 +176,33 @@ class RedOnly:
             if os.path.exists(self.out_folder):
                 shutil.rmtree(self.out_folder)
         except OSError as e:
-            self.logger.error(f"Failed to clean {self.out_folder}: {e}")
+            logging.error(f"Failed to clean {self.out_folder}: {e}")
             return False
         
         try:
             os.makedirs(self.out_folder)
         except OSError:
-            self.logger.error(f"Failed to create {self.out_folder}: {e}")
+            logging.error(f"Failed to create {self.out_folder}: {e}")
             return False
         
         try:
             shutil.copyfile("style.css", os.path.join(self.out_folder, "style.css"))
         except:
-            self.logger.error("Failed to copy style")
+            logging.error("Failed to copy style")
             return False
 
         for sub in self.subreddits:
-            self.logger.info(f"Creating {sub}...")
+            logging.info(f"Creating {sub}...")
             if not self._write_subreddit(sub):
-                self.logger.error(f"Failed to write subreddit {sub}")
+                logging.error(f"Failed to write subreddit {sub}")
                 return False
-        self.logger.info("Creating index...")
+        logging.info("Creating index...")
         if not self._write_index():
-            self.logger.error(f"Failed to write index")
+            logging.error(f"Failed to write index")
             return False
-        self.logger.info("All done!")
+        logging.info("All done!")
         return True
-
+logging.basicConfig(level=20)
 g = RedOnly("out_folder", ["Lyon", "AmitheAsshole"])
 if not g.generate():
     print("Failed to generate RedOnly")
