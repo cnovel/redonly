@@ -44,7 +44,7 @@ class Language(str, Enum):
 
 
 def get_path(f: str, lang: Language) -> str:
-    return f"{os.path.dirname(os.path.realpath(__file__))}/data/{lang/{f}"
+    return f"{os.path.dirname(os.path.realpath(__file__))}/data/{lang}/{f}"
 
 
 class Post:
