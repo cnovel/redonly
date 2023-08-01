@@ -53,9 +53,6 @@ class Post:
         self.self_post_data = p["selftext"] if p["is_self"] else None
         self.is_image = "post_hint" in p and p["post_hint"] == "image"
 
-    def __str__(self) -> str:
-        return f"{self.title} by {self.author} at {self.datetime} - ({self.domain}) - {self.score}"
-
     def create_element(self, out_folder: str) -> str:
         element_path = f"{os.path.dirname(os.path.realpath(__file__))}/data/element.html"
         with open(element_path, 'r') as template:
