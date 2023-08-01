@@ -56,7 +56,8 @@ class Post:
         return f"{self.title} by {self.author} at {self.datetime} - ({self.domain}) - {self.score}"
     
     def create_element(self, out_folder: str) -> str:
-        with open("element.html", 'r') as template:
+        element_path = f"{os.path.dirname(os.path.realpath(__file__))}/data/element.html"
+        with open(element_path, 'r') as template:
             content = template.read()
             img_name = ""
             if self.thumb_url != "self" and self.thumb_url != "default" and self.thumb_url != "nsfw" and self.thumb_url != "":
@@ -72,14 +73,16 @@ class Post:
             flair_text_color = "#fff" if self.flair_text_color == "light" else "#333"
             content = content.replace("$$FLAIR_TEXT_COLOR$$", flair_text_color)
             if self.self_post_data is not None:
-                with open("self_post.html", 'r') as sp:
+                self_post_path = f"{os.path.dirname(os.path.realpath(__file__))}/data/self_post.html"
+                with open(self_post_path, 'r') as sp:
                     content_sp = sp.read()
                     content_sp = content_sp.replace("$$SELF_POST$$", f"<p>{markdown.markdown(self.self_post_data)}</p>")
                     content = content.replace("$$SELF_POST$$", content_sp)
             elif self.is_image:
                 img_name = download_image(self.url, False, out_folder)
                 if len(img_name) > 0:
-                    with open("self_image.html") as si:
+                    self_img_path = f"{os.path.dirname(os.path.realpath(__file__))}/data/self_image.html"
+                    with open(self_img_path, 'r') as si:
                         content_si = si.read()
                         content_si = content_si.replace("$$IMG_URL$$", img_name)
                         content = content.replace("$$SELF_POST$$", content_si)
@@ -98,7 +101,8 @@ class Subreddit:
         self.img = sr_data["community_icon"].split("?")[0]
     
     def create_element(self, out_folder: str) -> str:
-        with open("sub.html", 'r') as template:
+        sub_path = f"{os.path.dirname(os.path.realpath(__file__))}/data/sub.html"
+        with open(sub_path, 'r') as template:
             content = template.read()
             img_name = ""
             if self.img != "self" and self.img != "default" and self.img != "nsfw" and self.img != "":
@@ -146,7 +150,8 @@ class RedOnly:
             for p in posts:
                 elements += p.create_element(self.out_folder)
 
-            with open("template.html") as page:
+            template_path = f"{os.path.dirname(os.path.realpath(__file__))}/data/template.html"
+            with open(template_path, 'r') as page:
                 content = page.read()
                 content = content.replace("$$SUBREDDIT$$", sub)
                 content = content.replace("$$ELEMENTS$$", elements)
@@ -168,7 +173,9 @@ class RedOnly:
         for sub in subreddits_data:
             subs += sub.create_element(self.out_folder)
 
-        with open("template.html") as page:
+
+        template_path = f"{os.path.dirname(os.path.realpath(__file__))}/data/template.html"
+        with open(template_path) as page:
             content = page.read()
             content = content.replace("$$SUBREDDIT$$", "index")
             content = content.replace("$$ELEMENTS$$", subs)
@@ -191,10 +198,11 @@ class RedOnly:
             logging.error(f"Failed to create {self.out_folder}: {e}")
             return False
         
+        style_path = f"{os.path.dirname(os.path.realpath(__file__))}/data/style.css"
         try:
-            shutil.copyfile("style.css", os.path.join(self.out_folder, "style.css"))
+            shutil.copyfile(style_path, os.path.join(self.out_folder, "style.css"))
         except:
-            logging.error("Failed to copy style")
+            logging.error(f"Failed cococ to copy style from {style_path}")
             return False
 
         for sub in self.subreddits:
