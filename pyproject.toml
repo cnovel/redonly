@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "redonly"
-version = "0.0.1"
+version = "0.5.0"
 authors = [
   { name="Cyril Novel" },
 ]
@@ -17,7 +17,7 @@ classifiers = [
 ]
 dependencies = [
     "Markdown ~= 3.3.6",
-    "Pillow ~= 9.0.1",
+    "Pillow ~= 10.0.0",
     "requests ~= 2.25.1",
 ]
 
