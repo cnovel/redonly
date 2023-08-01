@@ -44,6 +44,10 @@ class Language(StrEnum):
     fr = auto()
 
 
+class Style(StrEnum):
+    original = auto()
+
+
 def get_path(f: str, lang: Language) -> str:
     return f"{os.path.dirname(os.path.realpath(__file__))}/data/{lang}/{f}"
 
@@ -126,10 +130,11 @@ class Subreddit:
 
 
 class RedOnly:
-    def __init__(self, out_folder: str, subreddits, lang: Language = Language.en) -> None:
+    def __init__(self, out_folder: str, subreddits, lang: Language = Language.en, style: Style = Style.original) -> None:
         self.out_folder = out_folder
         self.subreddits = sorted(subreddits, key=lambda v: v.upper())
         self.lang = lang
+        self.style = style
 
     @staticmethod
     def version() -> str:
@@ -214,7 +219,7 @@ class RedOnly:
         if not self._set_up_folder():
             return False
 
-        style_path = get_path("style.css", self.lang)
+        style_path = get_path(f"{self.style}.css", self.lang)
         try:
             shutil.copyfile(style_path, os.path.join(self.out_folder, "style.css"))
         except Exception:
