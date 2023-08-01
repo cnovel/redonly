@@ -32,7 +32,7 @@ def download_image(img_url: str, is_thumbnail: bool, out_folder: str) -> str:
             img = img.resize((int(size[0]/factor) + 1, int(size[1]/factor) + 1), Image.ANTIALIAS)
         img.save(img_out, optimize=True, quality=q)
         return img_name
-    except:
+    except Exception:
         os.remove(img_out)
         return ""
 
@@ -184,7 +184,7 @@ class RedOnly:
                 ro_page.write(content)
         return True
 
-    def generate(self) -> bool:
+    def _set_up_folder(self) -> bool:
         try:
             if os.path.exists(self.out_folder):
                 shutil.rmtree(self.out_folder)
@@ -197,11 +197,16 @@ class RedOnly:
         except OSError as e:
             logging.error(f"Failed to create {self.out_folder}: {e}")
             return False
+        return True
+
+    def generate(self) -> bool:
+        if not self._set_up_folder():
+            return False
 
         style_path = f"{os.path.dirname(os.path.realpath(__file__))}/data/style.css"
         try:
             shutil.copyfile(style_path, os.path.join(self.out_folder, "style.css"))
-        except:
+        except Exception:
             logging.error(f"Failed cococ to copy style from {style_path}")
             return False
 
