@@ -6,6 +6,12 @@ import logging
 from datetime import datetime
 from urllib.parse import urlparse, urljoin
 from PIL import Image
+from importlib import metadata
+
+try:
+    __version__ = metadata.version(__package__)
+except metadata.PackageNotFoundError as e:
+    __version__ = "9999.9999.9999-githubclone"
 
 
 def download_image(img_url: str, is_thumbnail: bool, out_folder: str) -> str:
@@ -111,7 +117,7 @@ class RedOnly:
     
     @staticmethod
     def version() -> str:
-        return "0.0.1"
+        return __version__
 
     @staticmethod
     def _get_headers() -> dict:
