@@ -3,6 +3,8 @@ import os
 import markdown
 import shutil
 import logging
+from enum import auto
+from strenum import StrEnum
 from datetime import datetime
 from urllib.parse import urlparse, urljoin
 from PIL import Image
@@ -37,8 +39,17 @@ def download_image(img_url: str, is_thumbnail: bool, out_folder: str) -> str:
         return ""
 
 
+class Language(StrEnum):
+    en = auto()
+    fr = auto()
+
+
+def get_path(f: str, lang: Language) -> str:
+    return f"{os.path.dirname(os.path.realpath(__file__))}/data/{lang}/{f}"
+
+
 class Post:
-    def __init__(self, p) -> None:
+    def __init__(self, p, lang: Language) -> None:
         self.title = p["title"]
         self.url = p["url"]
         self.author = p["author"]
@@ -48,13 +59,14 @@ class Post:
         self.thumb_url = p["thumbnail"]
         self.flair = " ".join([x for x in p["link_flair_text"].split(" ") if not x.endswith(":") and not x.startswith(":")]) \
             if p["link_flair_text"] else ""
-        self.flair_color = p["link_flair_background_color"]
+        self.flair_color = p["link_flair_background_color"] if p["link_flair_background_color"] else "#666"
         self.flair_text_color = p["link_flair_text_color"]
         self.self_post_data = p["selftext"] if p["is_self"] else None
         self.is_image = "post_hint" in p and p["post_hint"] == "image"
+        self.lang = lang
 
     def create_element(self, out_folder: str) -> str:
-        element_path = f"{os.path.dirname(os.path.realpath(__file__))}/data/element.html"
+        element_path = get_path("element.html", self.lang)
         with open(element_path, 'r') as template:
             content = template.read()
             img_name = ""
@@ -71,7 +83,7 @@ class Post:
             flair_text_color = "#fff" if self.flair_text_color == "light" else "#333"
             content = content.replace("$$FLAIR_TEXT_COLOR$$", flair_text_color)
             if self.self_post_data is not None:
-                self_post_path = f"{os.path.dirname(os.path.realpath(__file__))}/data/self_post.html"
+                self_post_path = get_path("self_post.html", self.lang)
                 with open(self_post_path, 'r') as sp:
                     content_sp = sp.read()
                     content_sp = content_sp.replace("$$SELF_POST$$", f"<p>{markdown.markdown(self.self_post_data)}</p>")
@@ -79,7 +91,7 @@ class Post:
             elif self.is_image:
                 img_name = download_image(self.url, False, out_folder)
                 if len(img_name) > 0:
-                    self_img_path = f"{os.path.dirname(os.path.realpath(__file__))}/data/self_image.html"
+                    self_img_path = get_path("self_image.html", self.lang)
                     with open(self_img_path, 'r') as si:
                         content_si = si.read()
                         content_si = content_si.replace("$$IMG_URL$$", img_name)
@@ -92,14 +104,15 @@ class Post:
 
 
 class Subreddit:
-    def __init__(self, sub: str, sr_data) -> None:
+    def __init__(self, sub: str, sr_data, lang: Language) -> None:
         self.link_name = sub
         self.description = sr_data["public_description"]
         self.name = sr_data["display_name"]
         self.img = sr_data["community_icon"].split("?")[0]
+        self.lang = lang
 
     def create_element(self, out_folder: str) -> str:
-        sub_path = f"{os.path.dirname(os.path.realpath(__file__))}/data/sub.html"
+        sub_path = get_path("sub.html", self.lang)
         with open(sub_path, 'r') as template:
             content = template.read()
             img_name = ""
@@ -113,9 +126,10 @@ class Subreddit:
 
 
 class RedOnly:
-    def __init__(self, out_folder: str, subreddits) -> None:
+    def __init__(self, out_folder: str, subreddits, lang: Language = Language.en) -> None:
         self.out_folder = out_folder
         self.subreddits = sorted(subreddits, key=lambda v: v.upper())
+        self.lang = lang
 
     @staticmethod
     def version() -> str:
@@ -141,14 +155,14 @@ class RedOnly:
         j = data.json()
         posts = []
         for p in j["data"]["children"]:
-            post = Post(p["data"])
+            post = Post(p["data"], self.lang)
             posts.append(post)
 
         elements = ""
         for p in posts:
             elements += p.create_element(self.out_folder)
 
-        template_path = f"{os.path.dirname(os.path.realpath(__file__))}/data/template.html"
+        template_path = get_path("template.html", self.lang)
         with open(template_path, 'r') as page:
             content = page.read()
             content = content.replace("$$SUBREDDIT$$", sub)
@@ -166,12 +180,12 @@ class RedOnly:
             if not data.status_code == 200:
                 logging.error(f"Failed to get about data ({data.status_code}) for {sub}")
                 return False
-            subreddits_data.append(Subreddit(sub, data.json()["data"]))
+            subreddits_data.append(Subreddit(sub, data.json()["data"], self.lang))
         subs = ""
         for sub in subreddits_data:
             subs += sub.create_element(self.out_folder)
 
-        template_path = f"{os.path.dirname(os.path.realpath(__file__))}/data/template.html"
+        template_path = get_path("template.html", self.lang)
         with open(template_path) as page:
             content = page.read()
             content = content.replace("$$SUBREDDIT$$", "index")
@@ -200,11 +214,11 @@ class RedOnly:
         if not self._set_up_folder():
             return False
 
-        style_path = f"{os.path.dirname(os.path.realpath(__file__))}/data/style.css"
+        style_path = get_path("style.css", self.lang)
         try:
             shutil.copyfile(style_path, os.path.join(self.out_folder, "style.css"))
         except Exception:
-            logging.error(f"Failed cococ to copy style from {style_path}")
+            logging.error(f"Failed to copy style from {style_path}")
             return False
 
         for sub in self.subreddits:
