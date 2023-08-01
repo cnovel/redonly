@@ -9,7 +9,7 @@ from datetime import datetime
 from urllib.parse import urlparse, urljoin
 from PIL import Image
 from importlib import metadata
-from babel.dates import format_date, format_datetime, format_time
+from babel.dates import format_date, format_time
 
 try:
     __version__ = metadata.version(__package__)
