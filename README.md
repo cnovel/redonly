@@ -17,7 +17,7 @@ Here's a minimal example for using RedOnly:
 ```python
 import redonly.redonly as ro
 
-ronly = ro.RedOnly("output_folder", ["france", "europe", "ProgrammerHumor"], ro.Language.fr, ro.Style.original)
+ronly = ro.RedOnly("output_folder", ["france", "europe", "ProgrammerHumor"])
 if not ronly.generate():
     print("Failed to generate!")
 else:
