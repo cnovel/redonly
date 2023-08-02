@@ -50,6 +50,13 @@ class Style(StrEnum):
     dark = auto()
 
 
+class Options:
+    def __init__(self, lang: Language = Language.en, style: Style = Style.original, target_old: bool = True) -> None:
+        self.lang = lang
+        self.style = style
+        self.target_old = target_old
+
+
 def get_html_path(f: str, lang: Language) -> str:
     return f"{os.path.dirname(os.path.realpath(__file__))}/data/{lang}/{f}"
 
@@ -59,7 +66,7 @@ def get_style_path(f: str) -> str:
 
 
 class Post:
-    def __init__(self, p, lang: Language) -> None:
+    def __init__(self, p, opts: Options) -> None:
         self.title = p["title"]
         self.url = p["url"]
         self.author = p["author"]
@@ -73,10 +80,10 @@ class Post:
         self.flair_text_color = p["link_flair_text_color"]
         self.self_post_data = p["selftext"] if p["is_self"] else None
         self.is_image = "post_hint" in p and p["post_hint"] == "image"
-        self.lang = lang
+        self.opts = opts
 
     def create_element(self, out_folder: str) -> str:
-        element_path = get_html_path("element.html", self.lang)
+        element_path = get_html_path("element.html", self.opts.lang)
         with open(element_path, 'r', encoding='utf-8') as template:
             content = template.read()
             img_name = ""
@@ -93,7 +100,7 @@ class Post:
             flair_text_color = "#fff" if self.flair_text_color == "light" else "#333"
             content = content.replace("$$FLAIR_TEXT_COLOR$$", flair_text_color)
             if self.self_post_data is not None:
-                self_post_path = get_html_path("self_post.html", self.lang)
+                self_post_path = get_html_path("self_post.html", self.opts.lang)
                 with open(self_post_path, 'r', encoding='utf-8') as sp:
                     content_sp = sp.read()
                     content_sp = content_sp.replace("$$SELF_POST$$", f"<p>{markdown.markdown(self.self_post_data)}</p>")
@@ -101,7 +108,7 @@ class Post:
             elif self.is_image:
                 img_name = download_image(self.url, False, out_folder)
                 if len(img_name) > 0:
-                    self_img_path = get_html_path("self_image.html", self.lang)
+                    self_img_path = get_html_path("self_image.html", self.opts.lang)
                     with open(self_img_path, 'r', encoding='utf-8') as si:
                         content_si = si.read()
                         content_si = content_si.replace("$$IMG_URL$$", img_name)
@@ -114,15 +121,15 @@ class Post:
 
 
 class Subreddit:
-    def __init__(self, sub: str, sr_data, lang: Language) -> None:
+    def __init__(self, sub: str, sr_data, opts: Options) -> None:
         self.link_name = sub
         self.description = sr_data["public_description"]
         self.name = sr_data["display_name"]
         self.img = sr_data["community_icon"].split("?")[0]
-        self.lang = lang
+        self.opts = opts
 
     def create_element(self, out_folder: str) -> str:
-        sub_path = get_html_path("sub.html", self.lang)
+        sub_path = get_html_path("sub.html", self.opts.lang)
         with open(sub_path, 'r', encoding='utf-8') as template:
             content = template.read()
             img_name = ""
@@ -136,11 +143,10 @@ class Subreddit:
 
 
 class RedOnly:
-    def __init__(self, out_folder: str, subreddits, lang: Language = Language.en, style: Style = Style.original) -> None:
+    def __init__(self, out_folder: str, subreddits, opts: Options = Options()) -> None:
         self.out_folder = out_folder
         self.subreddits = sorted(subreddits, key=lambda v: v.upper())
-        self.lang = lang
-        self.style = style
+        self.opts = opts
 
     @staticmethod
     def version() -> str:
@@ -160,7 +166,7 @@ class RedOnly:
             Language.en: "en_US",
             Language.fr: "fr_FR"
         }
-        return d[self.lang]
+        return d[self.opts.lang]
 
     def _get_refresh_str(self) -> (str, str):
         now = datetime.now()
@@ -168,11 +174,14 @@ class RedOnly:
         t = format_time(now, locale=self._get_local_from_lang(), format='short')
         return d, t
 
+    def _get_prefix(self) -> str:
+        return "old" if self.opts.target_old else "www"
+
     def _write_subreddit(self, sub: str) -> bool:
         s = requests.Session()
         d, t = self._get_refresh_str()
         refresh_date = f'{d}, {t}'
-        data = s.get(f"https://www.reddit.com/r/{sub}/hot.json", headers=self._get_headers())
+        data = s.get(f"https://{self._get_prefix()}.reddit.com/r/{sub}/hot.json", headers=self._get_headers())
         if not data.status_code == 200:
             logging.error(f"Failed to get data ({data.status_code}) for {sub}")
             return False
@@ -180,14 +189,14 @@ class RedOnly:
         j = data.json()
         posts = []
         for p in j["data"]["children"]:
-            post = Post(p["data"], self.lang)
+            post = Post(p["data"], self.opts)
             posts.append(post)
 
         elements = ""
         for p in posts:
             elements += p.create_element(self.out_folder)
 
-        template_path = get_html_path("template.html", self.lang)
+        template_path = get_html_path("template.html", self.opts.lang)
         with open(template_path, 'r', encoding='utf-8') as page:
             content = page.read()
             content = content.replace("$$SUBREDDIT$$", sub)
@@ -203,16 +212,16 @@ class RedOnly:
         refresh_date = f'{d}, {t}'
         subreddits_data = []
         for sub in self.subreddits:
-            data = s.get(f"https://www.reddit.com/r/{sub}/about.json", headers=self._get_headers())
+            data = s.get(f"https://{self._get_prefix()}.reddit.com/r/{sub}/about.json", headers=self._get_headers())
             if not data.status_code == 200:
                 logging.error(f"Failed to get about data ({data.status_code}) for {sub}")
                 return False
-            subreddits_data.append(Subreddit(sub, data.json()["data"], self.lang))
+            subreddits_data.append(Subreddit(sub, data.json()["data"], self.opts))
         subs = ""
         for sub in subreddits_data:
             subs += sub.create_element(self.out_folder)
 
-        template_path = get_html_path("template.html", self.lang)
+        template_path = get_html_path("template.html", self.opts.lang)
         with open(template_path, 'r', encoding='utf-8') as page:
             content = page.read()
             content = content.replace("$$SUBREDDIT$$", "index")
@@ -241,7 +250,7 @@ class RedOnly:
         if not self._set_up_folder():
             return False
 
-        style_path = get_style_path(f"{self.style}.css")
+        style_path = get_style_path(f"{self.opts.style}.css")
         try:
             shutil.copyfile(style_path, os.path.join(self.out_folder, "style.css"))
         except Exception:
