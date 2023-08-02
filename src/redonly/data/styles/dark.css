@@ -1,0 +1,115 @@
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.5;
+    margin: 0;
+    padding: 10px;
+    background-color: #333; /* Dark background color */
+    color: #f7f7f7; /* Light text color */
+}
+
+h1 {
+    color: #c41717;
+    margin-left: 5%;
+    margin-bottom: 0px;
+}
+
+h1 a {
+    color: #c41717;
+    text-decoration: none;
+}
+
+h1 a:hover {
+    color: #c41717;
+    text-decoration: underline overline;
+}
+
+.last_refresh {
+    color: #aaa; /* Light gray text color */
+    margin-left: 5%;
+    margin-bottom: 10px;
+    margin-top: 0px;
+}
+
+.element {
+    margin-bottom: 5px;
+    padding: 10px;
+    background-color: #444; /* Darker background for elements */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    max-width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    transition: 0.25s;
+}
+
+.element_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start; /* Align image to the top */
+}
+
+.selfpost {
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #444; /* Darker background for self-posts */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    max-width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.element:hover {
+    box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
+    transform: translate(0, -3px);
+} 
+
+.element_header a {
+    color: #ccc; /* Light gray link color */
+    text-decoration: none;
+}
+
+.image {
+    width: 50px; /* Adjust the size of the image as per your requirements */
+    height: 50px; /* Make it a square by using the same height and width */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 4px;
+    margin-right: 8px; /* Add some spacing between the image and the text */
+    margin-left: 8px; /* Add some spacing between the image and the text */
+}
+
+.details {
+    flex: 1; /* Fill available space */
+}
+
+.title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #fff; /* White title color */
+    margin: 0 0 0 0; /* Adjust the margin as per your preference */
+}
+
+.datetime {
+    font-size: 12px;
+    color: #aaa; /* Light gray datetime color */
+    margin: 1px; /* Reset margin to avoid extra spacing */
+}
+
+.score {
+    min-width: 50px;
+    font-size: 18px;
+    color: #ccc; /* Light gray score color */
+    margin-top: 8px; /* Add margin between title and score */
+    text-align: center;
+}
+
+.flair {
+    border-radius: 4px;
+    padding: 5px;
+    text-align: center;
+    text-transform: uppercase;
+    background-color: #555; /* Darker background for flairs */
+    color: #ccc; /* Light gray text color for flairs */
+}

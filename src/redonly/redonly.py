@@ -47,6 +47,7 @@ class Language(StrEnum):
 
 class Style(StrEnum):
     original = auto()
+    dark = auto()
 
 
 def get_html_path(f: str, lang: Language) -> str:
