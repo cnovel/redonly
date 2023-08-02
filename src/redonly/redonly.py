@@ -76,7 +76,7 @@ class Post:
 
     def create_element(self, out_folder: str) -> str:
         element_path = get_html_path("element.html", self.lang)
-        with open(element_path, 'r') as template:
+        with open(element_path, 'r', encoding='utf-8') as template:
             content = template.read()
             img_name = ""
             if self.thumb_url != "self" and self.thumb_url != "default" and self.thumb_url != "nsfw" and self.thumb_url != "":
@@ -93,7 +93,7 @@ class Post:
             content = content.replace("$$FLAIR_TEXT_COLOR$$", flair_text_color)
             if self.self_post_data is not None:
                 self_post_path = get_html_path("self_post.html", self.lang)
-                with open(self_post_path, 'r') as sp:
+                with open(self_post_path, 'r', encoding='utf-8') as sp:
                     content_sp = sp.read()
                     content_sp = content_sp.replace("$$SELF_POST$$", f"<p>{markdown.markdown(self.self_post_data)}</p>")
                     content = content.replace("$$SELF_POST$$", content_sp)
@@ -101,7 +101,7 @@ class Post:
                 img_name = download_image(self.url, False, out_folder)
                 if len(img_name) > 0:
                     self_img_path = get_html_path("self_image.html", self.lang)
-                    with open(self_img_path, 'r') as si:
+                    with open(self_img_path, 'r', encoding='utf-8') as si:
                         content_si = si.read()
                         content_si = content_si.replace("$$IMG_URL$$", img_name)
                         content = content.replace("$$SELF_POST$$", content_si)
@@ -122,7 +122,7 @@ class Subreddit:
 
     def create_element(self, out_folder: str) -> str:
         sub_path = get_html_path("sub.html", self.lang)
-        with open(sub_path, 'r') as template:
+        with open(sub_path, 'r', encoding='utf-8') as template:
             content = template.read()
             img_name = ""
             if self.img != "self" and self.img != "default" and self.img != "nsfw" and self.img != "":
@@ -161,12 +161,15 @@ class RedOnly:
         }
         return d[self.lang]
 
-    def _write_subreddit(self, sub: str) -> bool:
-        s = requests.Session()
+    def _get_refresh_str(self) -> (str, str):
         now = datetime.now()
         d = format_date(now, locale=self._get_local_from_lang())
         t = format_time(now, locale=self._get_local_from_lang(), format='short')
+        return d, t
 
+    def _write_subreddit(self, sub: str) -> bool:
+        s = requests.Session()
+        d, t = self._get_refresh_str()
         refresh_date = f'{d}, {t}'
         data = s.get(f"https://www.reddit.com/r/{sub}/hot.json", headers=self._get_headers())
         if not data.status_code == 200:
@@ -184,7 +187,7 @@ class RedOnly:
             elements += p.create_element(self.out_folder)
 
         template_path = get_html_path("template.html", self.lang)
-        with open(template_path, 'r') as page:
+        with open(template_path, 'r', encoding='utf-8') as page:
             content = page.read()
             content = content.replace("$$SUBREDDIT$$", sub)
             content = content.replace("$$ELEMENTS$$", elements)
@@ -195,6 +198,8 @@ class RedOnly:
 
     def _write_index(self) -> bool:
         s = requests.Session()
+        d, t = self._get_refresh_str()
+        refresh_date = f'{d}, {t}'
         subreddits_data = []
         for sub in self.subreddits:
             data = s.get(f"https://www.reddit.com/r/{sub}/about.json", headers=self._get_headers())
@@ -207,12 +212,12 @@ class RedOnly:
             subs += sub.create_element(self.out_folder)
 
         template_path = get_html_path("template.html", self.lang)
-        with open(template_path) as page:
+        with open(template_path, 'r', encoding='utf-8') as page:
             content = page.read()
             content = content.replace("$$SUBREDDIT$$", "index")
             content = content.replace("$$ELEMENTS$$", subs)
-            content = content.replace("$$LAST_REFRESH_STR$$", "now")
-            with open(f"{self.out_folder}/index.html", 'w') as ro_page:
+            content = content.replace("$$LAST_REFRESH_STR$$", refresh_date)
+            with open(f"{self.out_folder}/index.html", 'w', encoding='utf-8') as ro_page:
                 ro_page.write(content)
         return True
 
