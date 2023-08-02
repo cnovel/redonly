@@ -15,7 +15,7 @@ class TestRedOnly():
         print(f"Folder {self.temp_folder} removed!")
     
     def test_two_french_subs(self):
-        redonly = ro.RedOnly(self.temp_folder, ["france", "Lyon"], ro.Language.fr)
+        redonly = ro.RedOnly(self.temp_folder, ["france", "Lyon"], ro.Language.fr, ro.Style.dark)
         assert redonly.generate(), "Failed to generate RedOnly in French!"
     
     def test_two_en_subs(self):
