@@ -161,12 +161,15 @@ class RedOnly:
         }
         return d[self.lang]
 
-    def _write_subreddit(self, sub: str) -> bool:
-        s = requests.Session()
+    def _get_refresh_str(self) -> (str, str):
         now = datetime.now()
         d = format_date(now, locale=self._get_local_from_lang())
         t = format_time(now, locale=self._get_local_from_lang(), format='short')
+        return d, t
 
+    def _write_subreddit(self, sub: str) -> bool:
+        s = requests.Session()
+        d, t = self._get_refresh_str()
         refresh_date = f'{d}, {t}'
         data = s.get(f"https://www.reddit.com/r/{sub}/hot.json", headers=self._get_headers())
         if not data.status_code == 200:
@@ -195,6 +198,8 @@ class RedOnly:
 
     def _write_index(self) -> bool:
         s = requests.Session()
+        d, t = self._get_refresh_str()
+        refresh_date = f'{d}, {t}'
         subreddits_data = []
         for sub in self.subreddits:
             data = s.get(f"https://www.reddit.com/r/{sub}/about.json", headers=self._get_headers())
@@ -211,7 +216,7 @@ class RedOnly:
             content = page.read()
             content = content.replace("$$SUBREDDIT$$", "index")
             content = content.replace("$$ELEMENTS$$", subs)
-            content = content.replace("$$LAST_REFRESH_STR$$", "now")
+            content = content.replace("$$LAST_REFRESH_STR$$", refresh_date)
             with open(f"{self.out_folder}/index.html", 'w') as ro_page:
                 ro_page.write(content)
         return True
