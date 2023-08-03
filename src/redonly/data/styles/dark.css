@@ -43,9 +43,6 @@ h1 a:hover {
 }
 
 .element_header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start; /* Align image to the top */
 }
 
 .selfpost {
@@ -70,6 +67,7 @@ h1 a:hover {
 }
 
 .image {
+    float: left;
     width: 50px; /* Adjust the size of the image as per your requirements */
     height: 50px; /* Make it a square by using the same height and width */
     background-size: cover;
@@ -93,15 +91,20 @@ h1 a:hover {
 
 .datetime {
     font-size: 12px;
+    line-height: 20px;
     color: #aaa; /* Light gray datetime color */
     margin: 1px; /* Reset margin to avoid extra spacing */
 }
 
 .score {
-    min-width: 50px;
+    float: left;
+    width: 48px;
+    height: 48px;
+    border: solid 1px #555;
+    border-radius: 4px;
     font-size: 18px;
     color: #ccc; /* Light gray score color */
-    margin-top: 8px; /* Add margin between title and score */
+    line-height: 50px;
     text-align: center;
 }
 
