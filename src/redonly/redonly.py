@@ -41,17 +41,34 @@ def download_image(img_url: str, is_thumbnail: bool, out_folder: str) -> str:
 
 
 class Language(StrEnum):
+    """Available languages for the interface"""
     en = auto()
+    """English"""
     fr = auto()
+    """French"""
 
 
 class Style(StrEnum):
+    """Available styles for the interface"""
     original = auto()
+    """Original theme"""
     dark = auto()
+    """Dark theme"""
 
 
 class Options:
+    """Options for RedOnly object"""
     def __init__(self, lang: Language = Language.en, style: Style = Style.original, target_old: bool = True) -> None:
+        """
+        Constructor
+
+        :param lang: Language for the interface
+        :type lang: Language
+        :param style: Style for the interface
+        :type style: Style
+        :param target_old: If True, links to Reddit will point to old.reddit.com
+        :type lang: bool
+        """
         self.lang = lang
         self.style = style
         self.target_old = target_old
@@ -143,13 +160,30 @@ class Subreddit:
 
 
 class RedOnly:
+    """Main class of the package"""
     def __init__(self, out_folder: str, subreddits, opts: Options = Options()) -> None:
+        """
+        Constructor
+
+        :param out_folder: Path to output folder
+        :type out_folder: str
+        :param subreddits: List of subreddits to archive
+        :type subreddits: list[str]
+        :param opts: Options for the archiving process
+        :type opts: Options
+        """
         self.out_folder = out_folder
         self.subreddits = sorted(subreddits, key=lambda v: v.upper())
         self.opts = opts
 
     @staticmethod
     def version() -> str:
+        """
+        Return the version of the package
+
+        :return: Version of the package
+        :rtype: str
+        """
         return __version__
 
     @staticmethod
@@ -247,6 +281,12 @@ class RedOnly:
         return True
 
     def generate(self) -> bool:
+        """
+        Generate the archive
+
+        :return: True if archiving was completely successful, False otherwise
+        :rtype: bool
+        """
         if not self._set_up_folder():
             return False
 
