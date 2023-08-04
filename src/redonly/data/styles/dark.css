@@ -116,3 +116,20 @@ h1 a:hover {
     background-color: #555; /* Darker background for flairs */
     color: #ccc; /* Light gray text color for flairs */
 }
+
+footer {
+    color:#aaa;
+    margin-right: 5%;
+    text-align: right;
+    margin-top: 10px;
+}
+
+footer a {
+    color: #c41717;
+    text-decoration: none;
+}
+
+footer a:hover {
+    color: #c41717;
+    text-decoration: underline overline;
+}
