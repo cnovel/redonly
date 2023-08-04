@@ -54,6 +54,8 @@ class Style(StrEnum):
     """Original theme"""
     dark = auto()
     """Dark theme"""
+    minimal = auto()
+    """Minimal theme"""
 
 
 class Options:

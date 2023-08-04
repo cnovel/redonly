@@ -1,0 +1,23 @@
+body {
+    font-family: sans-serif;
+}
+
+.score {
+    float: left;
+    margin-right: 1em;
+}
+
+.element {
+    margin-bottom: 0.75em;
+}
+
+.flair {
+    padding: 2px;
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 0.75em;
+}
+
+.last_refresh {
+    margin-bottom: 3em;
+}

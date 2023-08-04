@@ -20,3 +20,4 @@ It is based on Reddit open JSON endpoints, and thus does not need any token.
 
    Examples
    Reference
+   Gallery
