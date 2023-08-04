@@ -13,7 +13,7 @@ Using `redonly` is straightforward. Here's a minimal example:
        print("Success")
 
 
-**RedOnly** has multiple options (see the details in the dedicated page) for specifying language, style, etc.
+**RedOnly** has multiple options (see the details in the :doc:`Reference` page) for specifying language, style, etc.
 
 Options can be specified like this:
 

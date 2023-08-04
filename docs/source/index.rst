@@ -3,15 +3,15 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to redonly's documentation!
-===================================
+RedOnly
+=======
 
 **redonly** is a Python package aiming at archiving multiple subreddits' frontpages at a given time.
 It is based on Reddit open JSON endpoints, and thus does not need any token.
 
 .. note::
 
-   This project is under active development.
+   This project is not affiliated in any way with Reddit.
 
 
 .. toctree::

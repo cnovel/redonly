@@ -67,7 +67,7 @@ class Options:
         :param style: Style for the interface
         :type style: Style
         :param target_old: If True, links to Reddit will point to old.reddit.com
-        :type lang: bool
+        :type target_old: bool
         """
         self.lang = lang
         self.style = style
