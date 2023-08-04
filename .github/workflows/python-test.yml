@@ -43,3 +43,7 @@ jobs:
         coverage run -m --source=redonly pytest
     - name: Upload Coverage to Codecov
       uses: codecov/codecov-action@v2
+    - name: Build documentation
+      run: |
+        cd docs
+        make html
