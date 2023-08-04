@@ -1,0 +1,5 @@
+%%SUBMITTED_BY%%:<i>soumis par</i> $$AUTHOR$$
+%%LAST_REFRESH%%:dernière mise à jour: $$LAST_REFRESH_STR$$
+%%MADE_WITH%%:Fait avec <a href="https://github.com/cnovel/redonly">RedOnly</a>
+%%READ_POST%%:Lire le poteau
+%%SHOW_IMAGE%%:Montrer l'image
