@@ -91,7 +91,7 @@ def localize_content(content: str, lang: Language) -> str:
         data = [line.strip().split(":", 1) for line in locale.readlines()]
         for d in data:
             t[d[0]] = d[1]
-    for k,v in t.items():
+    for k, v in t.items():
         content = content.replace(k, v)
     return content
 
