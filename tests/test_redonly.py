@@ -20,9 +20,9 @@ class TestRedOnly():
         assert redonly.generate(), "Failed to generate RedOnly in French!"
     
     def test_two_minimal_subs(self):
-        opts = ro.Options(ro.Style.minimal, True)
+        opts = ro.Options(style=ro.Style.minimal, target_old=True)
         redonly = ro.RedOnly(self.temp_folder, ["cpp", "Python"], opts)
-        assert redonly.generate(), "Failed to generate RedOnly in French!"
+        assert redonly.generate(), "Failed to generate RedOnly with minimal style!"
 
     def test_two_en_subs(self):
         redonly = ro.RedOnly(self.temp_folder, ["CasualUK", "news"])
