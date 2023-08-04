@@ -76,12 +76,24 @@ class Options:
         self.target_old = target_old
 
 
-def get_html_path(f: str, lang: Language) -> str:
-    return f"{os.path.dirname(os.path.realpath(__file__))}/data/{lang}/{f}"
+def get_html_path(f: str) -> str:
+    return f"{os.path.dirname(os.path.realpath(__file__))}/data/html/{f}"
 
 
 def get_style_path(f: str) -> str:
     return f"{os.path.dirname(os.path.realpath(__file__))}/data/styles/{f}"
+
+
+def localize_content(content: str, lang: Language) -> str:
+    t = {}
+    locale_path = f"{os.path.dirname(os.path.realpath(__file__))}/data/locale/{lang}.txt"
+    with open(locale_path, 'r') as locale:
+        data = [line.strip().split(":", 1) for line in locale.readlines()]
+        for d in data:
+            t[d[0]] = d[1]
+    for k, v in t.items():
+        content = content.replace(k, v)
+    return content
 
 
 class Post:
@@ -102,9 +114,10 @@ class Post:
         self.opts = opts
 
     def create_element(self, out_folder: str) -> str:
-        element_path = get_html_path("element.html", self.opts.lang)
+        element_path = get_html_path("element.html")
         with open(element_path, 'r', encoding='utf-8') as template:
             content = template.read()
+            content = localize_content(content, self.opts.lang)
             img_name = ""
             if self.thumb_url != "self" and self.thumb_url != "default" and self.thumb_url != "nsfw" and self.thumb_url != "":
                 img_name = download_image(self.thumb_url, True, out_folder)
@@ -119,17 +132,19 @@ class Post:
             flair_text_color = "#fff" if self.flair_text_color == "light" else "#333"
             content = content.replace("$$FLAIR_TEXT_COLOR$$", flair_text_color)
             if self.self_post_data is not None:
-                self_post_path = get_html_path("self_post.html", self.opts.lang)
+                self_post_path = get_html_path("self_post.html")
                 with open(self_post_path, 'r', encoding='utf-8') as sp:
                     content_sp = sp.read()
+                    content_sp = localize_content(content_sp, self.opts.lang)
                     content_sp = content_sp.replace("$$SELF_POST$$", f"<p>{markdown.markdown(self.self_post_data)}</p>")
                     content = content.replace("$$SELF_POST$$", content_sp)
             elif self.is_image:
                 img_name = download_image(self.url, False, out_folder)
                 if len(img_name) > 0:
-                    self_img_path = get_html_path("self_image.html", self.opts.lang)
+                    self_img_path = get_html_path("self_image.html")
                     with open(self_img_path, 'r', encoding='utf-8') as si:
                         content_si = si.read()
+                        content_si = localize_content(content_si, self.opts.lang)
                         content_si = content_si.replace("$$IMG_URL$$", img_name)
                         content = content.replace("$$SELF_POST$$", content_si)
                 else:
@@ -148,9 +163,10 @@ class Subreddit:
         self.opts = opts
 
     def create_element(self, out_folder: str) -> str:
-        sub_path = get_html_path("sub.html", self.opts.lang)
+        sub_path = get_html_path("sub.html")
         with open(sub_path, 'r', encoding='utf-8') as template:
             content = template.read()
+            content = localize_content(content, self.opts.lang)
             img_name = ""
             if self.img != "self" and self.img != "default" and self.img != "nsfw" and self.img != "":
                 img_name = download_image(self.img, True, out_folder)
@@ -232,9 +248,10 @@ class RedOnly:
         for p in posts:
             elements += p.create_element(self.out_folder)
 
-        template_path = get_html_path("template.html", self.opts.lang)
+        template_path = get_html_path("template.html")
         with open(template_path, 'r', encoding='utf-8') as page:
             content = page.read()
+            content = localize_content(content, self.opts.lang)
             content = content.replace("$$SUBREDDIT$$", sub)
             content = content.replace("$$ELEMENTS$$", elements)
             content = content.replace("$$LAST_REFRESH_STR$$", refresh_date)
@@ -257,9 +274,10 @@ class RedOnly:
         for sub in subreddits_data:
             subs += sub.create_element(self.out_folder)
 
-        template_path = get_html_path("template.html", self.opts.lang)
+        template_path = get_html_path("template.html")
         with open(template_path, 'r', encoding='utf-8') as page:
             content = page.read()
+            content = localize_content(content, self.opts.lang)
             content = content.replace("$$SUBREDDIT$$", "index")
             content = content.replace("$$ELEMENTS$$", subs)
             content = content.replace("$$LAST_REFRESH_STR$$", refresh_date)

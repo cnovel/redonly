@@ -1,0 +1,5 @@
+%%SUBMITTED_BY%%:<i>submitted by</i> $$AUTHOR$$
+%%LAST_REFRESH%%:last refresh: $$LAST_REFRESH_STR$$
+%%MADE_WITH%%:Made with <a href="https://github.com/cnovel/redonly">RedOnly</a>
+%%READ_POST%%:Read self-post
+%%SHOW_IMAGE%%:Show image
